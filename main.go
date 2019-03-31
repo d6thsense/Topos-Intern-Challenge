@@ -32,6 +32,7 @@ type Building_Insertable struct {
 
 func main() {
 
+	log.Println("Starting ETL Section")
 	var buildings []Building
 	//Extracting
 
@@ -122,6 +123,8 @@ func main() {
 		fmt.Println(insertable)
 	}
 
-	log.Println("Successfully Added Entries to Database")
+	log.Println("Successfully Added Entries to Database. ETL End")
+
+	log.Println("Starting Rest-API")
 
 }
