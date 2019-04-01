@@ -23,7 +23,7 @@ type Building struct {
 }
 
 type Building_Insertable struct {
-	ID               primitive.ObjectID `bson:"_id"`
+	_ID              primitive.ObjectID `bson:"_id"`
 	Borough          string
 	Status           string
 	ConstructionYear int
@@ -104,7 +104,6 @@ func trnsfrmLd(bldngs []Building) {
 
 	/*Transforming and Inserting*/
 	for i := range bldngs {
-		insertable.ID = primitive.NewObjectID()
 		val, typeErr := strconv.Atoi(bldngs[i].TYPE)
 		if typeErr != nil {
 			panic(typeErr.Error())
