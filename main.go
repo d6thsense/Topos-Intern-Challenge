@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	// "github.com/gorilla/mux"
 )
 
 func main() {
@@ -15,16 +14,12 @@ func main() {
 	/* Transforming and Loading into a local instance of MongoDB*/
 	trnsfrmLd(buildings)
 
-	log.Println("Successfully Added Entries to Database. ETL End")
+	log.Println("Successfully Added Entries to Database.")
+	log.Println("Ending ETL Section")
 
 	/* REST API */
 
 	log.Println("Starting Rest-API")
-
-	/* Router Init */
-	// router := mux.NewRouter()
-
-	/* Endpoints */
-	// router.HandleFunc("/buildings", getBuildings).Method("GET")
-
+	startAPI()
+	log.Println("Quiting Rest API")
 }
