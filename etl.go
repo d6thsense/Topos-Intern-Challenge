@@ -33,7 +33,7 @@ type Building_Insertable struct {
 
 func extract(bldngs *[]Building) {
 	/*Used the API Endpint to get the columns we'll be using here*/
-	resp, err := http.Get("https://data.cityofnewyork.us/resource/k8ez-gyqp.json?$select=bin,lststatype,cnstrct_yr,heightroof,feat_code")
+	resp, err := http.Get("https://data.cityofnewyork.us/resource/mtik-6c5q.json?$select=bin,lststatype,cnstrct_yr,heightroof,feat_code")
 	for err != nil {
 		log.Fatal(err)
 		fmt.Println("Error, getting data ! Trying again")
