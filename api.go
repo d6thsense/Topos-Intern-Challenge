@@ -93,10 +93,12 @@ func getBuildings(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/*Update a Building*/
 func updateBuilding(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/* Add Building*/
 func addBuilding(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var building Building_Insertable
@@ -105,20 +107,22 @@ func addBuilding(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+/*Statistics by Type*/
 func statHeightByType(w http.ResponseWriter, r *http.Request) {
-	var buildtype []TypeCount
+	var buildtype []TypeCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$type",
 		"Count":     bson.M{"$sum": 1},
 		"avHeight":  bson.M{"$avg": "$height"},
 		"minHeight": bson.M{"$min": "$height"},
 		"maxHeight": bson.M{"$max": "$height"}}}}
-	cursor, err := collection.Aggregate(context.TODO(), pipeline)
+	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
 	defer cursor.Close(context.TODO())
+	/* Iterating over each document */
 	for cursor.Next(context.TODO()) {
 		var typecount TypeCount
 		cursor.Decode(&typecount)
@@ -129,23 +133,26 @@ func statHeightByType(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
+	/*Returning the Final Answer*/
 	json.NewEncoder(w).Encode(buildtype)
 }
 
+/*Statistics by Boroughs*/
 func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
-	var buildtype []TypeCount
+	var buildtype []TypeCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$borough",
 		"Count":     bson.M{"$sum": 1},
 		"avHeight":  bson.M{"$avg": "$height"},
 		"minHeight": bson.M{"$min": "$height"},
 		"maxHeight": bson.M{"$max": "$height"}}}}
-	cursor, err := collection.Aggregate(context.TODO(), pipeline)
+	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
 	defer cursor.Close(context.TODO())
+	/* Iterating over each document */
 	for cursor.Next(context.TODO()) {
 		var typecount TypeCount
 		cursor.Decode(&typecount)
@@ -156,11 +163,13 @@ func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
+	/*Returning the Final Answer*/
 	json.NewEncoder(w).Encode(buildtype)
 }
 
+/*Statistics by Year Intervals*/
 func statHeightByYear(w http.ResponseWriter, r *http.Request) {
-	var buildtype []HeightCount
+	var buildtype []HeightCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{
 		"$bucketAuto": bson.M{
 			"groupBy": "$constructionyear",
@@ -171,13 +180,14 @@ func statHeightByYear(w http.ResponseWriter, r *http.Request) {
 				"minHeight": bson.M{"$min": "$height"},
 				"maxHeight": bson.M{"$max": "$height"}}}}}
 
-	cursor, err := collection.Aggregate(context.TODO(), pipeline)
+	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
 	defer cursor.Close(context.TODO())
+	/* Iterating over each document */
 	for cursor.Next(context.TODO()) {
 		var typecount HeightCount
 		cursor.Decode(&typecount)
@@ -188,5 +198,6 @@ func statHeightByYear(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
 		return
 	}
+	/*Returning the Final Answer*/
 	json.NewEncoder(w).Encode(buildtype)
 }
