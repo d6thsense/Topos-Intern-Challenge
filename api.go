@@ -19,6 +19,19 @@ type TypeCount struct {
 	Average float64 `bson:"Average"`
 }
 
+type HeightCount struct {
+	ID            *Interval `bson:"_id"`
+	Count         int       `bson:"count"`
+	AverageHeight float64   `bson:"avHeight"`
+	MinimumHeight float64   `bson:"minHeight"`
+	MaximumHeight float64   `bson:"maxHeight"`
+}
+
+type Interval struct {
+	Minimum int `bson:"min"`
+	Maximum int `bson:"max"`
+}
+
 var collection *mongo.Collection
 
 func startAPI() {
@@ -49,7 +62,7 @@ func startAPI() {
 	router.HandleFunc("/updateBuildings", updateBuilding).Methods("PUT")
 	router.HandleFunc("/addBuilding", addBuilding).Methods("POST")
 	router.HandleFunc("/statHeightByType", statHeightByType).Methods("GET")
-
+	router.HandleFunc("/statHeightByYear", statHeightByYear).Methods("GET")
 	log.Fatal(http.ListenAndServe(":4018", router))
 }
 
@@ -112,6 +125,34 @@ func statHeightByType(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(buildtype)
 }
 
-func averageHeight(w http.ResponseWriter, r *http.Request) {
+func statHeightByYear(w http.ResponseWriter, r *http.Request) {
+	var buildtype []HeightCount
+	pipeline := []bson.M{bson.M{
+		"$bucketAuto": bson.M{
+			"groupBy": "$constructionyear",
+			"buckets": 20,
+			"output": bson.M{
+				"count":     bson.M{"$sum": 1},
+				"avHeight":  bson.M{"$avg": "$height"},
+				"minHeight": bson.M{"$min": "$height"},
+				"maxHeight": bson.M{"$max": "$height"}}}}}
 
+	cursor, err := collection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	defer cursor.Close(context.TODO())
+	for cursor.Next(context.TODO()) {
+		var typecount HeightCount
+		cursor.Decode(&typecount)
+		buildtype = append(buildtype, typecount)
+	}
+	if err := cursor.Err(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	json.NewEncoder(w).Encode(buildtype)
 }
