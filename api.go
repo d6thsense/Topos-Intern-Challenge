@@ -65,6 +65,7 @@ func startAPI() {
 	router.HandleFunc("/addBuilding", addBuilding).Methods("POST")
 	router.HandleFunc("/statHeightByType", statHeightByType).Methods("GET")
 	router.HandleFunc("/statHeightByYear", statHeightByYear).Methods("GET")
+	router.HandleFunc("/statHeightByBorough", statHeightByBorough).Methods("GET")
 	log.Fatal(http.ListenAndServe(":4018", router))
 }
 
@@ -107,6 +108,33 @@ func addBuilding(w http.ResponseWriter, r *http.Request) {
 func statHeightByType(w http.ResponseWriter, r *http.Request) {
 	var buildtype []TypeCount
 	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$type",
+		"Count":     bson.M{"$sum": 1},
+		"avHeight":  bson.M{"$avg": "$height"},
+		"minHeight": bson.M{"$min": "$height"},
+		"maxHeight": bson.M{"$max": "$height"}}}}
+	cursor, err := collection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	defer cursor.Close(context.TODO())
+	for cursor.Next(context.TODO()) {
+		var typecount TypeCount
+		cursor.Decode(&typecount)
+		buildtype = append(buildtype, typecount)
+	}
+	if err := cursor.Err(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	json.NewEncoder(w).Encode(buildtype)
+}
+
+func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
+	var buildtype []TypeCount
+	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$borough",
 		"Count":     bson.M{"$sum": 1},
 		"avHeight":  bson.M{"$avg": "$height"},
 		"minHeight": bson.M{"$min": "$height"},
