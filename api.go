@@ -14,9 +14,11 @@ import (
 )
 
 type TypeCount struct {
-	ID      string  `bson:"_id"`
-	Count   int     `bson:"Count"`
-	Average float64 `bson:"Average"`
+	ID            string  `bson:"_id"`
+	Count         int     `bson:"Count"`
+	AverageHeight float64 `bson:"avHeight"`
+	MinimumHeight float64 `bson:"minHeight"`
+	MaximumHeight float64 `bson:"maxHeight"`
 }
 
 type HeightCount struct {
@@ -104,7 +106,11 @@ func addBuilding(w http.ResponseWriter, r *http.Request) {
 
 func statHeightByType(w http.ResponseWriter, r *http.Request) {
 	var buildtype []TypeCount
-	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$type", "Count": bson.M{"$sum": 1}, "Average": bson.M{"$avg": "$height"}}}}
+	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$type",
+		"Count":     bson.M{"$sum": 1},
+		"avHeight":  bson.M{"$avg": "$height"},
+		"minHeight": bson.M{"$min": "$height"},
+		"maxHeight": bson.M{"$max": "$height"}}}}
 	cursor, err := collection.Aggregate(context.TODO(), pipeline)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -130,7 +136,7 @@ func statHeightByYear(w http.ResponseWriter, r *http.Request) {
 	pipeline := []bson.M{bson.M{
 		"$bucketAuto": bson.M{
 			"groupBy": "$constructionyear",
-			"buckets": 20,
+			"buckets": 25,
 			"output": bson.M{
 				"count":     bson.M{"$sum": 1},
 				"avHeight":  bson.M{"$avg": "$height"},
