@@ -3,8 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -71,7 +76,43 @@ func startAPI() {
 	router.HandleFunc("/statHeightByBorough", statHeightByBorough).Methods("GET")
 	router.HandleFunc("/globalStatistics", globalStatistics).Methods("GET")
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
-	log.Fatal(http.ListenAndServe(":4018", router))
+
+	/* Server Setup*/
+	var wait time.Duration
+	flag.DurationVar(&wait, "graceful-timeout", time.Second*5, "The duration for which the server gracefully wait for existing connections to finish")
+	flag.Parse()
+
+	srv := &http.Server{
+		Addr: "0.0.0.0:4018",
+		// Good practice to set timeouts to avoid Slowloris attacks.
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      router,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	srv.Shutdown(ctx)
+
+	err = client.Disconnect(context.TODO())
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Connection to MongoDB closed.")
+	log.Println("\nShutting Down server")
+	os.Exit(0)
+
 }
 
 func getBuildings(w http.ResponseWriter, r *http.Request) {
