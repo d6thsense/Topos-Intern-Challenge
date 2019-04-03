@@ -287,33 +287,194 @@
         }
 
         function statByType() {
+            var key;
             $.ajax({
                 type: "GET",
-                url: '/statHeightByType',
+                url: "/statHeightByType",
                 success: function (result) {
-                    $('#t2').append(JSON.stringify(result))
-                }
-            })
+                    if (JSON.stringify(result) == "null")
+                        $('#t2').html("<div class='content is-large has-text-centered'>Database Empty</div>")
+                    else {
+                        $('#t2').empty();
+                        var table = document.createElement('table');
+                        table.classList.add('table');
+                        table.classList.add('is-fullwidth');
+                        table.classList.add('has-text-centered');
+                        var thead = document.createElement('thead');
+                        var tr = document.createElement('tr');
+                        h0 = document.createElement('th')
+                        h0.innerText = "S.No"
+                        tr.appendChild(h0);
+                        h1 = document.createElement('th')
+                        h1.innerText = "Type"
+                        tr.appendChild(h1);
+                        h2 = document.createElement('th')
+                        h2.innerText = "Count"
+                        h3 = document.createElement('th')
+                        h3.innerText = "Mean"
+                        h4 = document.createElement('th')
+                        h4.innerText = "Minimum Height"
+                        h5 = document.createElement('th')
+                        h5.innerText = "Maximum Height"
+                        h6 = document.createElement('th')
+                        h6.innerText = "Standard Deviation"
+                        tr.appendChild(h2);
+                        tr.appendChild(h3);
+                        tr.appendChild(h4);
+                        tr.appendChild(h5);
+                        tr.appendChild(h6);
+                        thead.appendChild(tr);
+                        table.append(thead);
+                        var tbody = document.createElement('tbody');
+                        for (var i = 0; i < result.length; i++) {
+                            console.log(result[i]);
+                            var trow = document.createElement('tr');
+                            var t = document.createElement('th');
+                            t.innerText = (i + 1)
+                            trow.appendChild(t);
+                            for (key in result[i]) {
+                                    var temp2 = document.createElement('td');
+                                    temp2.innerText = (result[i][key]);
+                                    trow.appendChild(temp2);
+                                }
+                            tbody.append(trow);
+                        }
+                        table.appendChild(tbody);
+                        $('#t2').append(table);
+                    }
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
         }
 
         function statByYear() {
+            var key;
             $.ajax({
                 type: "GET",
-                url: '/statHeightByYear',
+                url: "/statHeightByYear",
                 success: function (result) {
-                    $('#t4').append(JSON.stringify(result))
-                }
-            })
+                    if (JSON.stringify(result) == "null")
+                        $('#t4').html("<div class='content is-large has-text-centered'>Database Empty</div>")
+                    else {
+                        $('#t4').empty();
+                        var table = document.createElement('table');
+                        table.classList.add('table');
+                        table.classList.add('is-fullwidth');
+                        table.classList.add('has-text-centered');
+                        var thead = document.createElement('thead');
+                        var tr = document.createElement('tr');
+                        h0 = document.createElement('th')
+                        h0.innerText = "S.No"
+                        tr.appendChild(h0);
+                        h1 = document.createElement('th')
+                        h1.innerText = "Year"
+                        tr.appendChild(h1);
+                        h2 = document.createElement('th')
+                        h2.innerText = "Count"
+                        h3 = document.createElement('th')
+                        h3.innerText = "Mean"
+                        h4 = document.createElement('th')
+                        h4.innerText = "Minimum Height"
+                        h5 = document.createElement('th')
+                        h5.innerText = "Maximum Height"
+                        h6 = document.createElement('th')
+                        h6.innerText = "Standard Deviation"
+                        tr.appendChild(h2);
+                        tr.appendChild(h3);
+                        tr.appendChild(h4);
+                        tr.appendChild(h5);
+                        tr.appendChild(h6);
+                        thead.appendChild(tr);
+                        table.append(thead);
+                        var tbody = document.createElement('tbody');
+                        for (var i = 0; i < result.length; i++) {
+                            console.log(result[i]);
+                            var trow = document.createElement('tr');
+                            var t = document.createElement('th');
+                            t.innerText = (i + 1)
+                            trow.appendChild(t);
+                            for (key in result[i]) {
+                                    var temp2 = document.createElement('td');
+                                    if(key == 'ID'){
+                                        temp2.innerText = (result[i][key]['Minimum'] + " - " + result[i][key]['Maximum']);
+                                    }else{
+                                        temp2.innerText = (result[i][key]);
+                                    } 
+                                    
+                                    trow.appendChild(temp2);
+                                }
+                            tbody.append(trow);
+                        }
+                        table.appendChild(tbody);
+                        $('#t4').append(table);
+                    }
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
         }
 
         function statByBorough() {
+            var key;
             $.ajax({
                 type: "GET",
-                url: '/statHeightByBorough',
+                url: "/statHeightByBorough",
                 success: function (result) {
-                    $('#t3').append(JSON.stringify(result))
-                }
-            })
+                    if (JSON.stringify(result) == "null")
+                        $('#t3').html("<div class='content is-large has-text-centered'>Database Empty</div>")
+                    else {
+                        $('#t3').empty();
+                        var table = document.createElement('table');
+                        table.classList.add('table');
+                        table.classList.add('is-fullwidth');
+                        table.classList.add('has-text-centered');
+                        var thead = document.createElement('thead');
+                        var tr = document.createElement('tr');
+                        h0 = document.createElement('th')
+                        h0.innerText = "S.No"
+                        tr.appendChild(h0);
+                        h1 = document.createElement('th')
+                        h1.innerText = "Borough"
+                        tr.appendChild(h1);
+                        h2 = document.createElement('th')
+                        h2.innerText = "Count"
+                        h3 = document.createElement('th')
+                        h3.innerText = "Mean"
+                        h4 = document.createElement('th')
+                        h4.innerText = "Minimum Height"
+                        h5 = document.createElement('th')
+                        h5.innerText = "Maximum Height"
+                        h6 = document.createElement('th')
+                        h6.innerText = "Standard Deviation"
+                        tr.appendChild(h2);
+                        tr.appendChild(h3);
+                        tr.appendChild(h4);
+                        tr.appendChild(h5);
+                        tr.appendChild(h6);
+                        thead.appendChild(tr);
+                        table.append(thead);
+                        var tbody = document.createElement('tbody');
+                        for (var i = 0; i < result.length; i++) {
+                            console.log(result[i]);
+                            var trow = document.createElement('tr');
+                            var t = document.createElement('th');
+                            t.innerText = (i + 1)
+                            trow.appendChild(t);
+                            for (key in result[i]) {
+                                    var temp2 = document.createElement('td');
+                                    temp2.innerText = (result[i][key]);
+                                    trow.appendChild(temp2);
+                                }
+                            tbody.append(trow);
+                        }
+                        table.appendChild(tbody);
+                        $('#t3').append(table);
+                    }
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
         }
 
         function statsGlobal() {
