@@ -21,6 +21,8 @@
 ```bash
 go run main.go etl.go api.go
 ```
+From the root directory of this repo.
+
 The above command will launch the program which will give an option to run the _**ETL process**_ which fetches the data from  Building Footprints Dataset and loads it into MongoDB in a _NYC_DATA.Buildings_ the [0/1 Option]. Then the _**API**_ will be launched which will load the data from the 
 
 ### Client
