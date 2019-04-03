@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -109,8 +108,9 @@ func startAPI() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connection to MongoDB closed.")
-	log.Println("\nShutting Down server")
+	log.Println("Connection to MongoDB closed.")
+
+	log.Println("Exiting")
 	os.Exit(0)
 
 }
