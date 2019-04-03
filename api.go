@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -70,11 +69,13 @@ func startAPI() {
 	router.HandleFunc("/statHeightByType", statHeightByType).Methods("GET")
 	router.HandleFunc("/statHeightByYear", statHeightByYear).Methods("GET")
 	router.HandleFunc("/statHeightByBorough", statHeightByBorough).Methods("GET")
+	router.HandleFunc("/globalStatistics", globalStatistics).Methods("GET")
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	log.Fatal(http.ListenAndServe(":4018", router))
 }
 
 func getBuildings(w http.ResponseWriter, r *http.Request) {
+	log.Println("Serving All Buildings")
 	w.Header().Set("content-type", "application/json")
 	var buildings []Building_Outputable
 	cursor, err := collection.Find(context.TODO(), bson.M{})
@@ -99,7 +100,9 @@ func getBuildings(w http.ResponseWriter, r *http.Request) {
 }
 
 /* Add Building*/
+
 func addBuilding(w http.ResponseWriter, r *http.Request) {
+	log.Println("Adding a new building")
 	w.Header().Set("Content-Type", "application/json")
 	var building Building_Insertable
 	_ = json.NewDecoder(r.Body).Decode(&building)
@@ -108,10 +111,9 @@ func addBuilding(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeBuilding(w http.ResponseWriter, r *http.Request) {
+	log.Println("Removing a building")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("Im here")
 	params := mux.Vars(r)
-	fmt.Println(params)
 	objid, _ := primitive.ObjectIDFromHex(params["id"])
 	iddoc := bson.D{{"_id", objid}}
 	res, _ := collection.DeleteOne(context.TODO(), iddoc)
@@ -120,6 +122,7 @@ func removeBuilding(w http.ResponseWriter, r *http.Request) {
 
 /*Statistics by Type*/
 func statHeightByType(w http.ResponseWriter, r *http.Request) {
+	log.Println("Serving Stats by Height")
 	var buildtype []TypeCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$type",
 		"Count":     bson.M{"$sum": 1},
@@ -151,6 +154,7 @@ func statHeightByType(w http.ResponseWriter, r *http.Request) {
 
 /*Statistics by Boroughs*/
 func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
+	log.Println("Serving Stats by Borough")
 	var buildtype []TypeCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "$borough",
 		"Count":     bson.M{"$sum": 1},
@@ -182,6 +186,7 @@ func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
 
 /*Statistics by Year Intervals*/
 func statHeightByYear(w http.ResponseWriter, r *http.Request) {
+	log.Println("Serving Stats by Year")
 	var buildtype []HeightCount /* Final Result Holder*/
 	pipeline := []bson.M{bson.M{
 		"$bucketAuto": bson.M{
@@ -205,6 +210,38 @@ func statHeightByYear(w http.ResponseWriter, r *http.Request) {
 	for cursor.Next(context.TODO()) {
 		var typecount HeightCount
 		cursor.Decode(&typecount)
+		buildtype = append(buildtype, typecount)
+	}
+	if err := cursor.Err(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	/*Returning the Final Answer*/
+	json.NewEncoder(w).Encode(buildtype)
+}
+
+func globalStatistics(w http.ResponseWriter, r *http.Request) {
+	log.Println("Serving Global Stats")
+	var buildtype []TypeCount /* Final Result Holder*/
+	pipeline := []bson.M{bson.M{"$group": bson.M{"_id": "null",
+		"Count":     bson.M{"$sum": 1},
+		"avHeight":  bson.M{"$avg": "$height"},
+		"minHeight": bson.M{"$min": "$height"},
+		"maxHeight": bson.M{"$max": "$height"},
+		"stdDev":    bson.M{"$stdDevPop": "$height"}}}}
+	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{ "Message": "` + err.Error() + `" }`))
+		return
+	}
+	defer cursor.Close(context.TODO())
+	/* Iterating over each document */
+	for cursor.Next(context.TODO()) {
+		var typecount TypeCount
+		cursor.Decode(&typecount)
+		typecount.ID = "Global"
 		buildtype = append(buildtype, typecount)
 	}
 	if err := cursor.Err(); err != nil {
