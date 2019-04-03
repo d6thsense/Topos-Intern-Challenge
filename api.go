@@ -3,30 +3,34 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type TypeCount struct {
-	ID            string  `bson:"_id"`
-	Count         int     `bson:"Count"`
-	AverageHeight float64 `bson:"avHeight"`
-	MinimumHeight float64 `bson:"minHeight"`
-	MaximumHeight float64 `bson:"maxHeight"`
+	ID                string  `bson:"_id"`
+	Count             int     `bson:"Count"`
+	AverageHeight     float64 `bson:"avHeight"`
+	MinimumHeight     float64 `bson:"minHeight"`
+	MaximumHeight     float64 `bson:"maxHeight"`
+	StandardDeviation float64 `bson:"stdDev"`
 }
 
 type HeightCount struct {
-	ID            *Interval `bson:"_id"`
-	Count         int       `bson:"count"`
-	AverageHeight float64   `bson:"avHeight"`
-	MinimumHeight float64   `bson:"minHeight"`
-	MaximumHeight float64   `bson:"maxHeight"`
+	ID                *Interval `bson:"_id"`
+	Count             int       `bson:"count"`
+	AverageHeight     float64   `bson:"avHeight"`
+	MinimumHeight     float64   `bson:"minHeight"`
+	MaximumHeight     float64   `bson:"maxHeight"`
+	StandardDeviation float64   `bson:"stdDev"`
 }
 
 type Interval struct {
@@ -61,17 +65,18 @@ func startAPI() {
 
 	/* Endpoints */
 	router.HandleFunc("/getBuildings", getBuildings).Methods("GET")
-	router.HandleFunc("/updateBuildings", updateBuilding).Methods("PUT")
 	router.HandleFunc("/addBuilding", addBuilding).Methods("POST")
+	router.HandleFunc("/removeBuilding/{id:[a-z0-9]*}", removeBuilding).Methods("DELETE")
 	router.HandleFunc("/statHeightByType", statHeightByType).Methods("GET")
 	router.HandleFunc("/statHeightByYear", statHeightByYear).Methods("GET")
 	router.HandleFunc("/statHeightByBorough", statHeightByBorough).Methods("GET")
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	log.Fatal(http.ListenAndServe(":4018", router))
 }
 
 func getBuildings(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
-	var buildings []Building_Insertable
+	var buildings []Building_Outputable
 	cursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -80,7 +85,7 @@ func getBuildings(w http.ResponseWriter, r *http.Request) {
 	}
 	defer cursor.Close(context.TODO())
 	for cursor.Next(context.TODO()) {
-		var building Building_Insertable
+		var building Building_Outputable
 		cursor.Decode(&building)
 		buildings = append(buildings, building)
 	}
@@ -93,17 +98,23 @@ func getBuildings(w http.ResponseWriter, r *http.Request) {
 
 }
 
-/*Update a Building*/
-func updateBuilding(w http.ResponseWriter, r *http.Request) {
-
-}
-
 /* Add Building*/
 func addBuilding(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var building Building_Insertable
 	_ = json.NewDecoder(r.Body).Decode(&building)
 	res, _ := collection.InsertOne(context.TODO(), building)
+	json.NewEncoder(w).Encode(res)
+}
+
+func removeBuilding(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("Im here")
+	params := mux.Vars(r)
+	fmt.Println(params)
+	objid, _ := primitive.ObjectIDFromHex(params["id"])
+	iddoc := bson.D{{"_id", objid}}
+	res, _ := collection.DeleteOne(context.TODO(), iddoc)
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -114,7 +125,8 @@ func statHeightByType(w http.ResponseWriter, r *http.Request) {
 		"Count":     bson.M{"$sum": 1},
 		"avHeight":  bson.M{"$avg": "$height"},
 		"minHeight": bson.M{"$min": "$height"},
-		"maxHeight": bson.M{"$max": "$height"}}}}
+		"maxHeight": bson.M{"$max": "$height"},
+		"stdDev":    bson.M{"$stdDevPop": "$height"}}}}
 	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -144,7 +156,8 @@ func statHeightByBorough(w http.ResponseWriter, r *http.Request) {
 		"Count":     bson.M{"$sum": 1},
 		"avHeight":  bson.M{"$avg": "$height"},
 		"minHeight": bson.M{"$min": "$height"},
-		"maxHeight": bson.M{"$max": "$height"}}}}
+		"maxHeight": bson.M{"$max": "$height"},
+		"stdDev":    bson.M{"$stdDevPop": "$height"}}}}
 	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -178,7 +191,8 @@ func statHeightByYear(w http.ResponseWriter, r *http.Request) {
 				"count":     bson.M{"$sum": 1},
 				"avHeight":  bson.M{"$avg": "$height"},
 				"minHeight": bson.M{"$min": "$height"},
-				"maxHeight": bson.M{"$max": "$height"}}}}}
+				"maxHeight": bson.M{"$max": "$height"},
+				"stdDev":    bson.M{"$stdDevPop": "$height"}}}}}
 
 	cursor, err := collection.Aggregate(context.TODO(), pipeline) /*Cursor to iterate over documents returned*/
 	if err != nil {
