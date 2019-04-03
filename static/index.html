@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Topos Intern Assignment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="columns is-gapless fixed">
+        <div class="column is-three-quarters">
+            <section class="hero is-info card-equal-height">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            Topos Intern Assignment | Backend Engineer
+                        </h1>
+                        <h2 class="subtitle">
+                            NYC Data Set
+                        </h2>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="column">
+            <section class="hero is-dark card-equal-height">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            Sushant Bansal<a target="_blank"
+                                href="https://www.linkedin.com/in/sushant-bansal/">&nbsp;&nbsp;<i
+                                    class="fab fa-linkedin"></i></a>
+                        </h1>
+                        <h2 class="subtitle">
+                            University of Chicago | M.S. in C.S.
+                        </h2>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="tabs is-centered is-fullwidth" id="tabs">
+        <ul>
+            <li class="is-active" data-tab="tab1Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-building" aria-hidden="true"></i></span>
+                    <span>All Buildings</span>
+                </a>
+            </li>
+            <li data-tab="tab2Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-landmark" aria-hidden="true"></i></span>
+                    <span>Statistics by Type</span>
+                </a>
+            </li>
+            <li data-tab="tab3Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-map" aria-hidden="true"></i></span>
+                    <span>Statistics by Borough</span>
+                </a>
+            </li>
+            <li data-tab="tab4Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span>
+                    <span>Statistics by Construction Year</span>
+                </a>
+            </li>
+            <li data-tab="tab5Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-globe-americas" aria-hidden="true"></i></span>
+                    <span>Global Statistics</span>
+                </a>
+            </li>
+            <li data-tab="tab6Content">
+                <a>
+                    <span class="icon is-small"><i class="fas fa-building" aria-hidden="true"></i></span>
+                    <span>Add Building</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <div id="tab-content">
+        <div class="is-active" data-content="tab1Content" id="t1">
+            t1
+        </div>
+        <div data-content="tab2Content" id="t2">
+            t2
+        </div>
+        <div data-content="tab3Content" id="t3">
+            t3
+        </div>
+        <div data-content="tab4Content" id="t4">
+            t4
+        </div>
+        <div data-content="tab4Content" id="t5">
+            t5
+        </div>
+        <div data-content="tab6Content" id="t6">
+
+            <section class="card column">
+                <div class="card-content">
+                    <div class="field">
+                        <label class="label">Borough</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="borough" id="borough">
+                                    <option>Manhattan</option>
+                                    <option>Brooklyn</option>
+                                    <option>Queens</option>
+                                    <option>Staten Island</option>
+                                    <option>The Bronx</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Status</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="status" id="status">
+                                    <option>Demolition</option>
+                                    <option>Alteration</option>
+                                    <option>Geometry</option>
+                                    <option>Initialization</option>
+                                    <option>Correction</option>
+                                    <option>Marked For Construction</option>
+                                    <option>Marked for Demolition</option>
+                                    <option>Constructed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Construction Year</label>
+                        <div class="control">
+                            <input class="input" type="number" name="constructionyear" id="cyear">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Height</label>
+                        <div class="control">
+                            <input class="input" type="number" min=0 step="any" name="year" id="height">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Type</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="type" id="type">
+                                    <option>Building</option>
+                                    <option>Building Under Construction</option>
+                                    <option>Garage</option>
+                                    <option>Skybridge</option>
+                                    <option>Gas Station Company</option>
+                                    <option>Storage Tank</option>
+                                    <option>Placeholder</option>
+                                    <option>Auxillary Structure</option>
+                                    <option>Temporary Structure</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-link" id="submitButton">Add !</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#tabs li').on('click', function () {
+                var tab = $(this).data('tab');
+                if (tab == "tab1Content") {
+                    getBuildings()
+                } else if (tab == "tab2Content") {
+                    statByType()
+                } else if (tab == "tab3Content") {
+                    statByBorough()
+                } else if (tab == "tab4Content") {
+                    statByYear()
+                }
+                $('#tabs li').removeClass('is-active');
+                $(this).addClass('is-active');
+                $('#tab-content div').removeClass('is-active');
+                $('div[data-content="' + tab + '"]').addClass('is-active');
+            });
+        });
+
+        $('#submitButton').click(function () {
+            year = parseInt($('#cyear').val());
+            height = parseFloat($('#height').val());
+            console.log(year, height);
+            var dat = { "Borough": $('#borough').val(), "Status": $('#status').val(), "ConstructionYear": year, "Height": height, "Type": $('#type').val() }
+            console.log(dat);
+            $.ajax({
+                type: "POST",
+                url: "/addBuilding",
+                data: JSON.stringify(dat),
+                success: function (result) {
+                    alert(JSON.stringify(result))
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        })
+
+        function getBuildings() {
+            var key;
+            $.ajax({
+                type: "GET",
+                url: "/getBuildings",
+                success: function (result) {
+                    if (JSON.stringify(result) == "null")
+                        $('#t1').html("<div class='content is-large has-text-centered'>Database Empty</div>")
+                    else {
+                        $('#t1').empty();
+                        var table = document.createElement('table');
+                        table.classList.add('table');
+                        table.classList.add('is-fullwidth');
+                        table.classList.add('has-text-centered');
+                        var thead = document.createElement('thead');
+                        var tr = document.createElement('tr');
+                        h1 = document.createElement('th')
+                        h1.innerText = "S.No"
+                        tr.appendChild(h1);
+                        h2 = document.createElement('th')
+                        h2.innerText = "Borough"
+                        h3 = document.createElement('th')
+                        h3.innerText = "Status"
+                        h4 = document.createElement('th')
+                        h4.innerText = "Construction Year"
+                        h5 = document.createElement('th')
+                        h5.innerText = "Height"
+                        h6 = document.createElement('th')
+                        h6.innerText = "Type"
+                        tr.appendChild(h2);
+                        tr.appendChild(h3);
+                        tr.appendChild(h4);
+                        tr.appendChild(h5);
+                        tr.appendChild(h6);
+                        thead.appendChild(tr);
+                        table.append(thead);
+                        var tbody = document.createElement('tbody');
+                        for (var i = 0; i < result.length; i++) {
+                            var trow = document.createElement('tr');
+                            var t = document.createElement('th');
+                            t.innerText = (i + 1)
+                            trow.appendChild(t);
+                            var j = 0;
+                            for (key in result[i]) {
+                                if (j != 0) {
+                                    var temp2 = document.createElement('td');
+                                    temp2.innerText = (result[i][key]);
+                                    trow.appendChild(temp2);
+                                } else { j = 1 }
+                            }
+                            var button = document.createElement('a');
+                            button.onclick = removeBuilding.bind(this, result[i]['ID']);
+                            button.innerHTML = '<i class="fas fa-times"></i>';
+                            trow.appendChild(button);
+                            tbody.append(trow);
+                        }
+                        table.appendChild(tbody);
+                        $('#t1').append(table);
+                    }
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
+        }
+
+        function statByType() {
+
+        }
+
+        function statByYear() {
+
+        }
+
+        function statByBorough() {
+
+        }
+
+        function updateRowCount(table) {
+            var rowcountAfterDelete = table.rows.length;
+            for (var i = 1; i < rowcountAfterDelete; i++) {
+                table.rows[i].cells[0].innerHTML = i;
+            }
+        }
+
+        function removeBuilding(id) {
+            $.ajax({
+                url: '/removeBuilding/'+id,
+                type: 'DELETE',
+                // success: alert("Succcess")
+            });
+            getBuildings();
+        }
+
+    </script>
+</body>
+
+</html>
