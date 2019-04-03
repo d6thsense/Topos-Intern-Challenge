@@ -13,7 +13,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
-<body>
+<body onload="getBuildings()">
     <div class="columns is-gapless fixed">
         <div class="column is-three-quarters">
             <section class="hero is-info card-equal-height">
@@ -90,19 +90,15 @@
 
     <div id="tab-content">
         <div class="is-active" data-content="tab1Content" id="t1">
-            t1
+
         </div>
         <div data-content="tab2Content" id="t2">
-            t2
         </div>
         <div data-content="tab3Content" id="t3">
-            t3
         </div>
         <div data-content="tab4Content" id="t4">
-            t4
         </div>
-        <div data-content="tab4Content" id="t5">
-            t5
+        <div data-content="tab5Content" id="t5">
         </div>
         <div data-content="tab6Content" id="t6">
 
@@ -197,6 +193,8 @@
                     statByBorough()
                 } else if (tab == "tab4Content") {
                     statByYear()
+                } else if (tab == "tab5Content") {
+                    statsGlobal()
                 }
                 $('#tabs li').removeClass('is-active');
                 $(this).addClass('is-active');
@@ -289,15 +287,94 @@
         }
 
         function statByType() {
-
+            $.ajax({
+                type: "GET",
+                url: '/statHeightByType',
+                success: function (result) {
+                    $('#t2').append(JSON.stringify(result))
+                }
+            })
         }
 
         function statByYear() {
-
+            $.ajax({
+                type: "GET",
+                url: '/statHeightByYear',
+                success: function (result) {
+                    $('#t4').append(JSON.stringify(result))
+                }
+            })
         }
 
         function statByBorough() {
+            $.ajax({
+                type: "GET",
+                url: '/statHeightByBorough',
+                success: function (result) {
+                    $('#t3').append(JSON.stringify(result))
+                }
+            })
+        }
 
+        function statsGlobal() {
+            var key;
+            $.ajax({
+                type: "GET",
+                url: "/globalStatistics",
+                success: function (result) {
+                    $('#t5').empty();
+                    if (JSON.stringify(result) == "null")
+                        $('#t5').html("<div class='content is-large has-text-centered'>Database Empty</div>")
+                    else {
+                        var pdiv = document.createElement('div');
+                        pdiv.classList.add('columns');
+                        var div = document.createElement('div');
+                        var table = document.createElement('table');
+                        pdiv.classList.add('is-centered');
+                        // div.classList.add('is-offset-one-quarter');
+                        pdiv.appendChild(div);
+                        table.classList.add('table');
+                        var thead = document.createElement('thead');
+                        var tr = document.createElement('tr');
+                        h2 = document.createElement('th')
+                        h2.innerText = "Count"
+                        h3 = document.createElement('th')
+                        h3.innerText = "Average"
+                        h4 = document.createElement('th')
+                        h4.innerText = "Minimum Height"
+                        h5 = document.createElement('th')
+                        h5.innerText = "Maximum Height"
+                        h6 = document.createElement('th')
+                        h6.innerText = "Standard Deviation"
+                        tr.appendChild(h2);
+                        tr.appendChild(h3);
+                        tr.appendChild(h4);
+                        tr.appendChild(h5);
+                        tr.appendChild(h6);
+                        thead.appendChild(tr);
+                        table.append(thead);
+                        var tbody = document.createElement('tbody');
+                        for (var i = 0; i < result.length; i++) {
+                            var trow = document.createElement('tr');
+                            var j = 0;
+                            for (key in result[i]) {
+                                if (j != 0) {
+                                    console.log(result[i][key])
+                                    var temp = document.createElement('td');
+                                    temp.innerText = (result[i][key]);
+                                    trow.appendChild(temp);
+                                } else { j = 1 }
+                            }
+                            tbody.append(trow);
+                        }
+                        table.appendChild(tbody);
+                        pdiv.appendChild(table);
+                        $('#t5').append(pdiv);
+                    }
+                },
+                dataType: "json",
+                contentType: "application/json"
+            });
         }
 
         function updateRowCount(table) {
@@ -307,9 +384,11 @@
             }
         }
 
+
+
         function removeBuilding(id) {
             $.ajax({
-                url: '/removeBuilding/'+id,
+                url: '/removeBuilding/' + id,
                 type: 'DELETE',
                 // success: alert("Succcess")
             });
