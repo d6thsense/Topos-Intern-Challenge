@@ -138,7 +138,7 @@ func trnsfrmLd(bldngs []Building) {
 		}
 		// fmt.Println(insertable)
 	}
-
+	log.Println("Successfully Added Entries to Database.")
 	err = client.Disconnect(context.TODO())
 	if err != nil {
 		log.Fatal(err)
